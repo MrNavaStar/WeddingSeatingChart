@@ -1,328 +1,563 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Wedding Guest Seating Chart</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Seating Chart</title>
     <style>
-        /* =============================
-           THEME & QUICK TWEAK VARIABLES
-           ============================= */
-        :root {
-            /* Colors */
-            --dusty-blue: #7599a6;           /* primary */
-            --dusty-blue-600: #5e8694;       /* darker accent */
-            --dusty-blue-200: #b8ccd3;       /* light accent */
-            --cream: #faf7f3;                /* background */
-            --gold: #d6b581;                 /* highlight */
-            --ink: #2e3a3f;                  /* text */
-
-            /* Layout sizing (you can tweak these) */
-            --chart-max-width: 980px;        /* overall chart width on desktop */
-            --chart-height: 650px;           /* drawing area height */
-            --table-size: 64px;              /* diameter of a round table */
-        }
-
-        /* ===== Base Styles ===== */
-        html, body { height: 100%; }
-        body {
+        * {
             margin: 0;
-            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, sans-serif;
-            color: var(--ink);
-            background: var(--cream);
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 20;
-            background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6));
-            backdrop-filter: saturate(1.2) blur(6px);
-            border-bottom: 1px solid rgba(46,58,63,0.06);
-        }
-        .container { max-width: 1040px; margin: 0 auto; padding: 14px 16px; }
-
-        .brand {
-            font-family: 'Playfair Display', Georgia, serif;
-            color: var(--dusty-blue-600);
-            font-size: clamp(1.25rem, 2.6vw, 1.85rem);
-            margin: 0 0 10px 0;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
         }
 
-        .controls { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
-        @media (max-width: 520px) { .controls { grid-template-columns: 1fr; } }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-        #search {
-            width: 100%;
-            font-size: 1rem;
-            padding: 12px 14px;
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #5d7c8a;
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+
+        .search-section {
+            background: white;
+            padding: 25px;
             border-radius: 12px;
-            border: 2px solid var(--dusty-blue-200);
-            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .search-box {
+            display: flex;
+            max-width: 400px;
+            margin: 0 auto;
+            gap: 10px;
+            position: relative;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
             outline: none;
-            box-shadow: 0 1px 0 rgba(0,0,0,0.02), 0 6px 18px rgba(94,134,148,0.06);
-        }
-        #search:focus { border-color: var(--dusty-blue); box-shadow: 0 0 0 4px rgba(117,153,166,0.18); }
-
-        button.reset {
-            appearance: none; cursor: pointer; border: none; border-radius: 12px;
-            padding: 12px 14px; font-weight: 600; font-size: 0.95rem;
-            color: #fff; background: var(--dusty-blue-600);
-            box-shadow: 0 6px 18px rgba(94,134,148,0.25);
-        }
-        button.reset:active { transform: translateY(1px); }
-
-        .note { font-size: 0.9rem; color: #56646a; margin-top: 8px; }
-
-        /* ===== Chart Area ===== */
-        .stage-wrap { display: grid; place-items: center; padding: 14px 16px 26px; }
-        #chart { position: relative; width: 100%; max-width: var(--chart-max-width); height: var(--chart-height); border-radius: 18px;
-            background: linear-gradient(180deg, #ffffff, #fbfbfb);
-            box-shadow: 0 14px 36px rgba(46,58,63,0.08), inset 0 0 0 1px rgba(46,58,63,0.06);
-            overflow: hidden; }
-
-        /* optional soft grid for layout guidance (toggle by adding .grid to #chart) */
-        #chart.grid::before {
-            content: ""; position: absolute; inset: 0; pointer-events: none;
-            background-image:
-                    linear-gradient(to right, rgba(117,153,166,0.08) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(117,153,166,0.08) 1px, transparent 1px);
-            background-size: 80px 80px; /* grid size */
+            transition: border-color 0.2s ease;
         }
 
-        /* ===== Tables ===== */
-        .table { position: absolute; width: var(--table-size); height: var(--table-size);
-            background: var(--dusty-blue-200); color: #fff; border-radius: 50%;
-            border: 2px solid var(--dusty-blue);
-            display: grid; place-items: center; font-weight: 700;
-            letter-spacing: 0.3px;
-            box-shadow: 0 10px 20px rgba(94,134,148,0.22);
-            transition: transform 240ms ease, box-shadow 240ms ease, background 240ms ease, border-color 240ms ease, color 240ms ease;
-            user-select: none; }
+        .search-input:focus {
+            border-color: #5d7c8a;
+        }
 
-        .table:hover { transform: translateY(-2px); }
+        .search-btn {
+            background: #5d7c8a;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
 
-        .table.highlight {
-            background: var(--gold); color: #2f2a20; border-color: var(--gold);
-            box-shadow: 0 0 0 8px rgba(214,181,129,0.25), 0 16px 36px rgba(214,181,129,0.35);
-            animation: pulse 1.3s ease-in-out 2;
-            transform: scale(1.12);
+        .search-btn:hover {
+            background: #4a6b7a;
+        }
+
+        .venue-container {
+            position: relative;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 40px;
+            margin-bottom: 30px;
+            min-height: 600px;
+            overflow: hidden;
+        }
+
+        .venue-layout {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            border: 2px dashed #dee2e6;
+        }
+
+        .head-table {
+            position: absolute;
+            width: 140px;
+            height: 80px;
+            background: linear-gradient(135deg, #5d7c8a 0%, #4a6b7a 100%);
+            border: 4px solid #3d5a6b;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 15;
+            left: 50%;
+            top: 10%;
+            transform: translate(-50%, -50%);
+        }
+
+        .head-table:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+            z-index: 25;
+        }
+
+        .head-table.highlighted {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, #6b8c9a 0%, #5a7b8a 100%);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+            transform: translate(-50%, -50%) scale(1.15);
+            z-index: 35;
+        }
+
+        .head-table-label {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 3px;
+            text-align: center;
+        }
+
+        .head-table-info {
+            font-size: 0.8rem;
+            color: #e8f4f8;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .head-table-guests {
+            font-size: 0.7rem;
+            color: #c8e6f0;
+            margin-top: 3px;
+        }
+
+        .table {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: white;
+            border: 3px solid #e9ecef;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             z-index: 10;
         }
 
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(214,181,129,0.35); }
-            70% { box-shadow: 0 0 0 16px rgba(214,181,129,0); }
-            100% { box-shadow: 0 0 0 0 rgba(214,181,129,0); }
+        .table:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 20;
         }
 
-        /* Head table (fixed top center for reference) */
-        .head-table { position: absolute; left: 50%; transform: translateX(-50%);
-            top: 18px; width: min(72%, 560px); height: 56px; border-radius: 14px;
-            background: var(--dusty-blue); color: #fff; border: 2px solid var(--dusty-blue-200);
-            display: grid; place-items: center; font-weight: 700; letter-spacing: 0.2px;
-            box-shadow: 0 10px 20px rgba(94,134,148,0.25); }
+        .table.highlighted {
+            border-color: #5d7c8a;
+            background: #f0f8ff;
+            box-shadow: 0 0 25px rgba(93, 124, 138, 0.6);
+            transform: scale(1.15);
+            z-index: 30;
+        }
 
-        /* Results & suggestions */
-        #result { text-align: center; font-weight: 700; margin: 10px auto 0; color: var(--dusty-blue-600); }
-        .suggestions { max-width: 680px; margin: 8px auto 0; padding: 8px 0; list-style: none; }
-        .suggestions li { cursor: pointer; padding: 10px 12px; margin: 6px 12px; border-radius: 12px; background: #fff;
-            border: 1px solid rgba(46,58,63,0.06); box-shadow: 0 6px 18px rgba(46,58,63,0.06); }
-        .suggestions li:hover { background: #f8fbfc; }
+        .table-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #5d7c8a;
+            margin-bottom: 2px;
+        }
 
-        /* ===== Mobile tweaks ===== */
-        @media (max-width: 680px) {
-            :root { --chart-height: 540px; --table-size: 52px; }
-            .head-table { height: 48px; font-size: 0.95rem; }
+        .layout-note {
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            font-style: italic;
+        }
+
+        .config-note {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #1976d2;
+        }
+
+        .config-note strong {
+            color: #1565c0;
+        }
+
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            margin-top: -1px;
+        }
+
+        .search-suggestions.show {
+            display: block;
+        }
+
+        .suggestion-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f8f9fa;
+            transition: background-color 0.2s ease;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .suggestion-table {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .venue-container {
+                padding: 20px;
+            }
+            
+            .venue-layout {
+                height: 400px;
+            }
+            
+            .table {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .table-number {
+                font-size: 1rem;
+            }
+            
+            .table-info {
+                font-size: 0.6rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .venue-layout {
+                height: 350px;
+            }
+            
+            .table {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .table-number {
+                font-size: 0.9rem;
+            }
+            
+            .table-info {
+                font-size: 0.5rem;
+            }
         }
     </style>
 </head>
 <body>
-<header>
     <div class="container">
-        <h1 class="brand">Find Your Seat!</h1>
-        <div class="controls" role="search">
-            <input id="search" type="text" placeholder="Search your name…" aria-label="Search guest name" list="guest-list" autocomplete="off" />
+        <div class="header">
+            <h1>Wedding Seating Chart</h1>
         </div>
-        <p class="note">Tip: start typing your first or last name — the matching table will glow.</p>
-        <datalist id="guest-list"></datalist>
+
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Search for a guest..." id="searchInput">
+                <button class="search-btn" onclick="searchGuest()">Search</button>
+            </div>
+            <div class="search-suggestions" id="searchSuggestions"></div>
+        </div>
+
+        <div class="venue-container">
+            <div class="venue-layout" id="venueLayout">
+                <div class="head-table" data-table="head">
+                    <div class="head-table-label">Head Table</div>
+                    <div class="head-table-info">Bride & Groom</div>
+                    <div class="head-table-guests">2 guests</div>
+                </div>
+                <!-- Tables will be positioned here by JavaScript -->
+            </div>
+        </div>
+
+        <div class="layout-note">
+            Tables are positioned to match the actual venue layout
+        </div>
     </div>
-</header>
 
-<main class="stage-wrap">
-    <section id="chart" aria-label="Ballroom layout with tables">
-        <div class="head-table" aria-hidden="true">Head Table</div>
-        <!-- Tables will be injected here by JS -->
-    </section>
+    <script>
+        // Table positions configuration - modify these to match your actual venue layout
+        // x and y are percentages (0-100) of the venue container
+        const tablePositions = [
+            { id: 1, x: 50, y: 15 },
+            { id: 2, x: 25, y: 20 },
+            { id: 3, x: 75, y: 20 },
+            { id: 4, x: 20, y: 40 },
+            { id: 5, x: 50, y: 45 },
+            { id: 6, x: 80, y: 40 },
+            { id: 7, x: 15, y: 65 },
+            { id: 8, x: 50, y: 70 },
+            { id: 9, x: 85, y: 65 },
+            { id: 10, x: 5, y: 50 },
+            { id: 11, x: 95, y: 50 }
+        ];
 
-    <div id="result" aria-live="polite"></div>
-    <ul class="suggestions" id="suggestions" aria-label="Matching guests"></ul>
-</main>
+        // Sample guest data - you can modify this with your actual guest list
+        const guests = [
+            { name: "mother of bride", table: 1, displayName: "Mother of Bride" },
+            { name: "father of bride", table: 1, displayName: "Father of Bride" },
+            { name: "mother of groom", table: 1, displayName: "Mother of Groom" },
+            { name: "father of groom", table: 1, displayName: "Father of Groom" },
+            { name: "maid of honor", table: 2, displayName: "Maid of Honor" },
+            { name: "best man", table: 2, displayName: "Best Man" },
+            { name: "bridesmaid 1", table: 2, displayName: "Bridesmaid 1" },
+            { name: "bridesmaid 2", table: 2, displayName: "Bridesmaid 2" },
+            { name: "groomsman 1", table: 2, displayName: "Groomsman 1" },
+            { name: "groomsman 2", table: 2, displayName: "Groomsman 2" },
+            { name: "grandma", table: 3, displayName: "Grandma" },
+            { name: "grandpa", table: 3, displayName: "Grandpa" },
+            { name: "aunt jane", table: 3, displayName: "Aunt Jane" },
+            { name: "uncle bob", table: 3, displayName: "Uncle Bob" },
+            { name: "cousin amy", table: 4, displayName: "Cousin Amy" },
+            { name: "cousin tom", table: 4, displayName: "Cousin Tom" },
+            { name: "aunt mary", table: 4, displayName: "Aunt Mary" },
+            { name: "uncle john", table: 4, displayName: "Uncle John" },
+            { name: "sarah smith", table: 5, displayName: "Sarah Smith" },
+            { name: "mike johnson", table: 5, displayName: "Mike Johnson" },
+            { name: "emily davis", table: 5, displayName: "Emily Davis" },
+            { name: "chris wilson", table: 5, displayName: "Chris Wilson" },
+            { name: "lisa brown", table: 6, displayName: "Lisa Brown" },
+            { name: "david miller", table: 6, displayName: "David Miller" },
+            { name: "jessica lee", table: 6, displayName: "Jessica Lee" },
+            { name: "ryan parker", table: 6, displayName: "Ryan Parker" },
+            { name: "amanda garcia", table: 7, displayName: "Amanda Garcia" },
+            { name: "kevin martinez", table: 7, displayName: "Kevin Martinez" },
+            { name: "rachel taylor", table: 7, displayName: "Rachel Taylor" },
+            { name: "jason anderson", table: 7, displayName: "Jason Anderson" },
+            { name: "sophia rodriguez", table: 8, displayName: "Sophia Rodriguez" },
+            { name: "daniel thomas", table: 8, displayName: "Daniel Thomas" },
+            { name: "olivia moore", table: 8, displayName: "Olivia Moore" },
+            { name: "william jackson", table: 8, displayName: "William Jackson" },
+            { name: "ava martin", table: 9, displayName: "Ava Martin" },
+            { name: "james lee", table: 9, displayName: "James Lee" },
+            { name: "isabella garcia", table: 9, displayName: "Isabella Garcia" },
+            { name: "benjamin rodriguez", table: 9, displayName: "Benjamin Rodriguez" },
+            { name: "mia davis", table: 10, displayName: "Mia Davis" },
+            { name: "elijah wilson", table: 10, displayName: "Elijah Wilson" },
+            { name: "charlotte brown", table: 10, displayName: "Charlotte Brown" },
+            { name: "lucas miller", table: 10, displayName: "Lucas Miller" },
+            { name: "amelia jones", table: 11, displayName: "Amelia Jones" },
+            { name: "henry taylor", table: 11, displayName: "Henry Taylor" },
+            { name: "harper anderson", table: 11, displayName: "Harper Anderson" },
+            { name: "sebastian thomas", table: 11, displayName: "Sebastian Thomas" }
+        ];
 
-<script>
-    // =========================
-    // CONFIGURATION VARIABLES
-    // =========================
-
-    // Tweak overall canvas size & table diameter directly via CSS variables at top.
-    // For precise table placement, edit the coordinates below (in pixels, relative to #chart's top-left corner).
-
-    const tablePositions = {
-        1:  { top: 110, left: 120 },
-        2:  { top: 110, left: 300 },
-        3:  { top: 110, left: 480 },
-        4:  { top: 110, left: 660 },
-
-        5:  { top: 240, left: 80 },
-        6:  { top: 240, left: 240 },
-        7:  { top: 240, left: 420 },
-        8:  { top: 240, left: 600 },
-
-        9:  { top: 370, left: 120 },
-        10: { top: 370, left: 300 },
-        11: { top: 370, left: 480 },
-        12: { top: 370, left: 660 }
-    };
-
-    // Map of Guest Name -> Table Number. Add your real guest list here.
-    // Partial names are supported (e.g., typing "Ari" matches "Arielle Collins").
-    const guests = {
-        "Alice Johnson": 1,
-        "Bob Smith": 3,
-        "Charlie Davis": 5,
-        "Diana Prince": 8,
-        "Ethan Brown": 12,
-        "Fiona Clark": 6,
-        "Arielle Collins": 2,
-        "Jordan Lee": 4,
-        "Sam Patel": 7,
-        "Morgan Taylor": 9,
-        "Jamie Nguyen": 10,
-        "Priya Shah": 11
-    };
-
-    // =========================
-    // RENDER TABLES
-    // =========================
-    const chart = document.getElementById('chart');
-    const tableElements = {};
-
-    function createTables() {
-        for (let i = 1; i <= 12; i++) {
-            const tbl = document.createElement('div');
-            tbl.className = 'table';
-            tbl.textContent = i;
-            tbl.setAttribute('role', 'button');
-            tbl.setAttribute('aria-label', `Table ${i}`);
-            tbl.dataset.table = i;
-
-            const pos = tablePositions[i];
-            if (!pos) continue;
-            tbl.style.top = pos.top + 'px';
-            tbl.style.left = pos.left + 'px';
-
-            tbl.addEventListener('click', () => focusTable(i, `Table ${i}`));
-
-            chart.appendChild(tbl);
-            tableElements[i] = tbl;
-        }
-    }
-
-    createTables();
-
-    // Populate datalist for quick native suggestions
-    const dataList = document.getElementById('guest-list');
-    Object.keys(guests).sort().forEach(name => {
-        const opt = document.createElement('option');
-        opt.value = name;
-        dataList.appendChild(opt);
-    });
-
-    // =========================
-    // SEARCH + HIGHLIGHT + AUTO-FOCUS
-    // =========================
-    const searchInput = document.getElementById('search');
-    const resultEl = document.getElementById('result');
-    const suggestions = document.getElementById('suggestions');
-
-    function normalize(str) {
-        return (str || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
-    }
-
-    function clearHighlights() {
-        Object.values(tableElements).forEach(el => el.classList.remove('highlight'));
-    }
-
-    function focusTable(tableNumber, labelText) {
-        clearHighlights();
-        const el = tableElements[tableNumber];
-        if (!el) return;
-        el.classList.add('highlight');
-        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-        resultEl.textContent = labelText || `Table ${tableNumber}`;
-    }
-
-    function setSuggestions(names, query) {
-        suggestions.innerHTML = '';
-        if (!names || names.length <= 1) return;
-        names.slice(0, 6).forEach(n => {
-            const li = document.createElement('li');
-            li.textContent = n;
-            li.addEventListener('click', () => {
-                searchInput.value = n;
-                runSearch(n);
+        // Create and position tables
+        function createTables() {
+            const venueLayout = document.getElementById('venueLayout');
+            
+            tablePositions.forEach(table => {
+                const tableElement = document.createElement('div');
+                tableElement.className = 'table';
+                tableElement.setAttribute('data-table', table.id);
+                tableElement.style.left = table.x + '%';
+                tableElement.style.top = table.y + '%';
+                tableElement.style.transform = 'translate(-50%, -50%)';
+                
+                tableElement.innerHTML = `
+                    <div class="table-number">${table.id}</div>
+                `;
+                
+                venueLayout.appendChild(tableElement);
             });
-            suggestions.appendChild(li);
+        }
+
+        // Real-time search highlighting
+        function searchGuest() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                clearHighlights();
+                return;
+            }
+
+            // Clear previous highlights
+            clearHighlights();
+
+            // Find matching guests
+            const matchingGuests = guests.filter(g => 
+                g.name.includes(searchTerm) || g.displayName.toLowerCase().includes(searchTerm)
+            );
+
+            if (matchingGuests.length > 0) {
+                // Highlight matching tables
+                matchingGuests.forEach(guest => {
+                    const tableElement = document.querySelector(`[data-table="${guest.table}"]`);
+                    if (tableElement) {
+                        tableElement.classList.add('highlighted');
+                    }
+                });
+            }
+        }
+
+        function clearHighlights() {
+            const highlightedTables = document.querySelectorAll('.table.highlighted');
+            highlightedTables.forEach(table => table.classList.remove('highlighted'));
+        }
+
+        // Real-time search as user types
+        function handleRealTimeSearch() {
+            const searchTerm = this.value.toLowerCase().trim();
+            const suggestionsContainer = document.getElementById('searchSuggestions');
+            console.log('Real-time search triggered:', searchTerm);
+            
+            if (searchTerm === '') {
+                clearHighlights();
+                suggestionsContainer.classList.remove('show');
+                return;
+            }
+
+            // Clear previous highlights
+            clearHighlights();
+
+            // Find matching guests
+            const matchingGuests = guests.filter(g => 
+                g.name.includes(searchTerm) || g.displayName.toLowerCase().includes(searchTerm)
+            );
+
+            if (matchingGuests.length > 0) {
+                // Highlight matching tables
+                matchingGuests.forEach(guest => {
+                    const tableElement = document.querySelector(`[data-table="${guest.table}"]`);
+                    if (tableElement) {
+                        tableElement.classList.add('highlighted');
+                    }
+                });
+            }
+
+            // Show search suggestions
+            showSearchSuggestions(searchTerm, matchingGuests);
+        }
+
+        // Show search suggestions
+        function showSearchSuggestions(searchTerm, matchingGuests) {
+            const suggestionsContainer = document.getElementById('searchSuggestions');
+            console.log('Showing suggestions for:', searchTerm, 'Matching guests:', matchingGuests);
+            
+            if (matchingGuests.length === 0) {
+                suggestionsContainer.classList.remove('show');
+                return;
+            }
+
+            // Limit suggestions to 8 items
+            const limitedGuests = matchingGuests.slice(0, 8);
+            
+            suggestionsContainer.innerHTML = limitedGuests.map(guest => `
+                <div class="suggestion-item" onclick="selectSuggestion('${guest.name}')">
+                    <div class="suggestion-name">${guest.displayName}</div>
+                    <div class="suggestion-table">Table ${guest.table}</div>
+                </div>
+            `).join('');
+            
+            suggestionsContainer.classList.add('show');
+            console.log('Suggestions container:', suggestionsContainer);
+        }
+
+        // Select a search suggestion
+        function selectSuggestion(guestName) {
+            document.getElementById('searchInput').value = guestName;
+            document.getElementById('searchSuggestions').classList.remove('show');
+            searchGuest();
+        }
+
+        // Initialize tables when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            createTables();
         });
-    }
 
-    function runSearch(val) {
-        const q = normalize(val ?? searchInput.value.trim());
-        clearHighlights();
-        suggestions.innerHTML = '';
+        // Allow search on Enter key
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchGuest();
+            }
+        });
 
-        if (!q) { resultEl.textContent = ''; return; }
+        // Real-time search highlighting
+        document.getElementById('searchInput').addEventListener('input', handleRealTimeSearch);
 
-        const names = Object.keys(guests);
-        const matches = names.filter(name => normalize(name).includes(q));
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            const searchSection = document.querySelector('.search-section');
+            const suggestions = document.getElementById('searchSuggestions');
+            
+            if (!searchSection.contains(e.target)) {
+                suggestions.classList.remove('show');
+            }
+        });
 
-        if (matches.length === 0) {
-            resultEl.textContent = 'Guest not found';
-            return;
-        }
-
-        // If exact match exists, prefer it; else use first match.
-        const exact = names.find(name => normalize(name) === q);
-        const chosen = exact || matches[0];
-        const tableNumber = guests[chosen];
-
-        focusTable(tableNumber, `${chosen} • Table ${tableNumber}`);
-
-        // Provide clickable alternatives if multiple matches
-        if (!exact && matches.length > 1) {
-            setSuggestions(matches, q);
-        }
-    }
-
-    searchInput.addEventListener('input', () => runSearch());
-    document.getElementById('clearBtn').addEventListener('click', () => {
-        searchInput.value = '';
-        suggestions.innerHTML = '';
-        resultEl.textContent = '';
-        clearHighlights();
-        searchInput.focus();
-    });
-
-    // Support pressing Enter to lock in the top suggestion
-    searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            runSearch();
-        }
-    });
-
-    // Expose a tiny helper for you from the console if needed
-    window._focusTable = focusTable;
-</script>
+        // Close suggestions when search input loses focus
+        document.getElementById('searchInput').addEventListener('blur', function() {
+            // Small delay to allow clicking on suggestions
+            setTimeout(() => {
+                document.getElementById('searchSuggestions').classList.remove('show');
+            }, 200);
+        });
+    </script>
 </body>
 </html>

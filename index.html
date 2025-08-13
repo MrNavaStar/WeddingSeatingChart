@@ -24,21 +24,9 @@
             padding: 20px;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            color: #5d7c8a;
-            font-size: 2.5rem;
-            font-weight: 300;
-            margin-bottom: 10px;
-        }
-
         .search-section {
             background: white;
-            padding: 25px;
+            padding: 20px;
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             margin-bottom: 30px;
@@ -50,7 +38,6 @@
             display: flex;
             max-width: 400px;
             margin: 0 auto;
-            gap: 10px;
             position: relative;
         }
 
@@ -68,19 +55,54 @@
             border-color: #5d7c8a;
         }
 
-        .search-btn {
-            background: #5d7c8a;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 16px;
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            margin-top: -1px;
+            width: 100%;
+            min-width: 300px;
+            text-align: left;
+        }
+
+        .search-suggestions.show {
+            display: block;
+        }
+
+        .suggestion-item {
+            padding: 6px 12px;
             cursor: pointer;
+            border-bottom: 1px solid #f8f9fa;
             transition: background-color 0.2s ease;
         }
 
-        .search-btn:hover {
-            background: #4a6b7a;
+        .suggestion-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-name {
+            font-weight: 500;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .suggestion-table {
+            font-size: 0.7rem;
+            color: #6c757d;
+            margin-top: 1px;
         }
 
         .venue-container {
@@ -217,53 +239,6 @@
             color: #1565c0;
         }
 
-        .search-suggestions {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #e9ecef;
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            display: none;
-            margin-top: -1px;
-        }
-
-        .search-suggestions.show {
-            display: block;
-        }
-
-        .suggestion-item {
-            padding: 10px 16px;
-            cursor: pointer;
-            border-bottom: 1px solid #f8f9fa;
-            transition: background-color 0.2s ease;
-        }
-
-        .suggestion-item:hover {
-            background-color: #f8f9fa;
-        }
-
-        .suggestion-item:last-child {
-            border-bottom: none;
-        }
-
-        .suggestion-name {
-            font-weight: 500;
-            color: #333;
-        }
-
-        .suggestion-table {
-            font-size: 0.8rem;
-            color: #6c757d;
-            margin-top: 2px;
-        }
-
         @media (max-width: 768px) {
             .venue-container {
                 padding: 20px;
@@ -284,10 +259,6 @@
             
             .table-info {
                 font-size: 0.6rem;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
             }
         }
 
@@ -313,16 +284,11 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Wedding Seating Chart</h1>
-        </div>
-
         <div class="search-section">
             <div class="search-box">
                 <input type="text" class="search-input" placeholder="Search for a guest..." id="searchInput">
-                <button class="search-btn" onclick="searchGuest()">Search</button>
+                <div class="search-suggestions" id="searchSuggestions"></div>
             </div>
-            <div class="search-suggestions" id="searchSuggestions"></div>
         </div>
 
         <div class="venue-container">

@@ -112,7 +112,6 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             padding: 40px;
             margin-bottom: 30px;
-            min-height: 600px;
             overflow: hidden;
         }
 
@@ -178,6 +177,42 @@
             font-size: 0.9rem;
             margin-top: 20px;
             font-style: italic;
+        }
+
+        .guest-list-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .guest-list {
+            text-align: left;
+            font-size: 0.9rem;
+            color: #333;
+            line-height: 1.6;
+            padding-right: 10px;
+        }
+
+        .guest-list-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.2s ease;
+        }
+
+        .guest-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .guest-list-item:hover {
+            background-color: #e9ecef;
+        }
+
+        .guest-list-name {
+            font-weight: 500;
+            color: #5d7c8a;
         }
 
         .config-note {
@@ -252,48 +287,6 @@
             font-size: 0.7rem;
             color: #c8e6f0;
             margin-top: 3px;
-        }
-
-        .guest-list-container {
-            background: #f8f9fa;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-top: 30px;
-            text-align: center;
-        }
-
-        .guest-list {
-            text-align: left;
-            font-size: 0.9rem;
-            color: #333;
-            line-height: 1.6;
-            padding-right: 10px;
-        }
-
-        .guest-list-item {
-            padding: 8px 12px;
-            border-bottom: 1px solid #e9ecef;
-            transition: background-color 0.2s ease;
-        }
-
-        .guest-list-item:last-child {
-            border-bottom: none;
-        }
-
-        .guest-list-item:hover {
-            background-color: #e9ecef;
-        }
-
-        .guest-list-name {
-            font-weight: 500;
-            color: #5d7c8a;
-        }
-
-        .guest-list-table {
-            font-size: 0.7rem;
-            color: #6c757d;
-            margin-top: 2px;
         }
 
         @media (max-width: 768px) {
@@ -410,17 +403,14 @@
             { name: "karen dick", table: 2, displayName: "Karen Dick" },
             { name: "garry anderson", table: 2, displayName: "Garry Anderson" },
             { name: "esther anderson", table: 2, displayName: "Esther Anderson" },
-            { name: "andew barraclough", table: 2, displayName: "Andew Barraclough" },
-            { name: "dina willis", table: 2, displayName: "Dina Willis" },
-            { name: "tom turk", table: 2, displayName: "Tom Turk" },
-            { name: "zoe barraclough", table: 2, displayName: "Zoe Barraclough" },
             
             // Table 3
-            { name: "susan young", table: 3, displayName: "Susan Young" },
-            { name: "karl swierkot", table: 3, displayName: "Karl Swierkot" },
+            { name: "andew barraclough", table: 3, displayName: "Andew Barraclough" },
+            { name: "dina willis", table: 3, displayName: "Dina Willis" },
+            { name: "tom turk", table: 3, displayName: "Tom Turk" },
+            { name: "zoe barraclough", table: 3, displayName: "Zoe Barraclough" },
             { name: "sharon barraclough", table: 3, displayName: "Sharon Barraclough" },
             { name: "brianne d'souza", table: 3, displayName: "Brianne D'Souza" },
-            { name: "brian young", table: 3, displayName: "Brian Young" },
             
             // Table 4
             { name: "michael bergen", table: 4, displayName: "Michael Bergen" },
@@ -433,7 +423,7 @@
             { name: "aylie mohr", table: 4, displayName: "Aylie Mohr" },
             
             // Table 5
-            { name: "jennifer bell-komarnicki", table: 5, displayName: "Jennifer Bell-Komarnicki" },
+            { name: "jennifer komarnicki", table: 5, displayName: "Jennifer Komarnicki" },
             { name: "kevin kormanicki", table: 5, displayName: "Kevin Kormanicki" },
             { name: "mercedes bell", table: 5, displayName: "Mercedes Bell" },
             { name: "kade lowes", table: 5, displayName: "Kade Lowes" }, 
@@ -614,9 +604,8 @@
                 return;
             }
 
-            // Clear previous highlights and guest list
+            // Clear previous highlights
             clearHighlights();
-            clearGuestList();
 
             // Find matching guests
             const matchingGuests = guests.filter(g => 
@@ -632,11 +621,17 @@
                     }
                 });
 
-                // Auto-open guest list if only one table matches
+                // Auto-update guest list if only one table matches
                 if (matchingGuests.length === 1) {
                     const uniqueTable = matchingGuests[0].table;
                     showGuestList(uniqueTable);
+                } else {
+                    // Clear guest list if multiple tables match
+                    clearGuestList();
                 }
+            } else {
+                // Clear guest list if no matches
+                clearGuestList();
             }
 
             // Show search suggestions
@@ -680,7 +675,7 @@
                 const tableElement = document.querySelector(`[data-table="${guest.table}"]`);
                 if (tableElement) {
                     tableElement.classList.add('highlighted');
-                    // Auto-open guest list for this table
+                    // Auto-update guest list for this table
                     showGuestList(guest.table);
                 }
             }

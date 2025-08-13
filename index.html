@@ -125,60 +125,6 @@
             border: 2px dashed #dee2e6;
         }
 
-        .head-table {
-            position: absolute;
-            width: 140px;
-            height: 80px;
-            background: linear-gradient(135deg, #5d7c8a 0%, #4a6b7a 100%);
-            border: 4px solid #3d5a6b;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            z-index: 15;
-            left: 50%;
-            top: 10%;
-            transform: translate(-50%, -50%);
-        }
-
-        .head-table:hover {
-            transform: translate(-50%, -50%) scale(1.05);
-            box-shadow: 0 6px 25px rgba(0,0,0,0.3);
-            z-index: 25;
-        }
-
-        .head-table.highlighted {
-            border-color: #ffd700;
-            background: linear-gradient(135deg, #6b8c9a 0%, #5a7b8a 100%);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-            transform: translate(-50%, -50%) scale(1.15);
-            z-index: 35;
-        }
-
-        .head-table-label {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 3px;
-            text-align: center;
-        }
-
-        .head-table-info {
-            font-size: 0.8rem;
-            color: #e8f4f8;
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        .head-table-guests {
-            font-size: 0.7rem;
-            color: #c8e6f0;
-            margin-top: 3px;
-        }
-
         .table {
             position: absolute;
             width: 80px;
@@ -239,6 +185,49 @@
             color: #1565c0;
         }
 
+        .head-table {
+            position: absolute;
+            width: 100px;
+            height: 60px;
+            background: linear-gradient(135deg, #5d7c8a 0%, #4a6b7a 100%);
+            border: 4px solid #3d5a6b;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 15;
+        }
+
+        .head-table:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+            z-index: 25;
+        }
+
+        .head-table-label {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 3px;
+            text-align: center;
+        }
+
+        .head-table-info {
+            font-size: 0.8rem;
+            color: #e8f4f8;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .head-table-guests {
+            font-size: 0.7rem;
+            color: #c8e6f0;
+            margin-top: 3px;
+        }
+
         @media (max-width: 768px) {
             .venue-container {
                 padding: 20px;
@@ -293,11 +282,6 @@
 
         <div class="venue-container">
             <div class="venue-layout" id="venueLayout">
-                <div class="head-table" data-table="head">
-                    <div class="head-table-label">Head Table</div>
-                    <div class="head-table-info">Bride & Groom</div>
-                    <div class="head-table-guests">2 guests</div>
-                </div>
                 <!-- Tables will be positioned here by JavaScript -->
             </div>
         </div>
@@ -311,68 +295,136 @@
         // Table positions configuration - modify these to match your actual venue layout
         // x and y are percentages (0-100) of the venue container
         const tablePositions = [
-            { id: 1, x: 35, y: 30 },
-            { id: 2, x: 65, y: 30 },
-            { id: 3, x: 40, y: 55 },
-            { id: 4, x: 60, y: 55 },
-            { id: 5, x: 90, y: 30 },
-            { id: 6, x: 80, y: 55 },
-            { id: 7, x: 80, y: 10 },
-            { id: 8, x: 25, y: 55 },
-            { id: 9, x: 10, y: 55 },
-            { id: 10, x: 20, y: 30 },
-            { id: 11, x: 25, y: 10 },
-            { id: 12, x: 10, y: 10 },
+            { id: 1, x: 35, y: 52 },
+            { id: 2, x: 65, y: 52 },
+            { id: 3, x: 40, y: 75 },
+            { id: 4, x: 60, y: 75 },
+            { id: 5, x: 83, y: 52 },
+            { id: 6, x: 75, y: 75 },
+            { id: 7, x: 75, y: 30 },
+            { id: 8, x: 25, y: 75 },
+            { id: 9, x: 10, y: 75 },
+            { id: 10, x: 17, y: 52 },
+            { id: 11, x: 25, y: 30 },
+            { id: 12, x: 10, y: 30 },
+            { id: "head", x: 50, y: 30 }
         ];
 
-        // Sample guest data - you can modify this with your actual guest list
+        // Wedding guest data from CSV file
         const guests = [
-            { name: "mother of bride", table: 1, displayName: "Mother of Bride" },
-            { name: "father of bride", table: 1, displayName: "Father of Bride" },
-            { name: "mother of groom", table: 1, displayName: "Mother of Groom" },
-            { name: "father of groom", table: 1, displayName: "Father of Groom" },
-            { name: "maid of honor", table: 2, displayName: "Maid of Honor" },
-            { name: "best man", table: 2, displayName: "Best Man" },
-            { name: "bridesmaid 1", table: 2, displayName: "Bridesmaid 1" },
-            { name: "bridesmaid 2", table: 2, displayName: "Bridesmaid 2" },
-            { name: "groomsman 1", table: 2, displayName: "Groomsman 1" },
-            { name: "groomsman 2", table: 2, displayName: "Groomsman 2" },
-            { name: "grandma", table: 3, displayName: "Grandma" },
-            { name: "grandpa", table: 3, displayName: "Grandpa" },
-            { name: "aunt jane", table: 3, displayName: "Aunt Jane" },
-            { name: "uncle bob", table: 3, displayName: "Uncle Bob" },
-            { name: "cousin amy", table: 4, displayName: "Cousin Amy" },
-            { name: "cousin tom", table: 4, displayName: "Cousin Tom" },
-            { name: "aunt mary", table: 4, displayName: "Aunt Mary" },
-            { name: "uncle john", table: 4, displayName: "Uncle John" },
-            { name: "sarah smith", table: 5, displayName: "Sarah Smith" },
-            { name: "mike johnson", table: 5, displayName: "Mike Johnson" },
-            { name: "emily davis", table: 5, displayName: "Emily Davis" },
-            { name: "chris wilson", table: 5, displayName: "Chris Wilson" },
-            { name: "lisa brown", table: 6, displayName: "Lisa Brown" },
-            { name: "david miller", table: 6, displayName: "David Miller" },
-            { name: "jessica lee", table: 6, displayName: "Jessica Lee" },
-            { name: "ryan parker", table: 6, displayName: "Ryan Parker" },
-            { name: "amanda garcia", table: 7, displayName: "Amanda Garcia" },
-            { name: "kevin martinez", table: 7, displayName: "Kevin Martinez" },
-            { name: "rachel taylor", table: 7, displayName: "Rachel Taylor" },
-            { name: "jason anderson", table: 7, displayName: "Jason Anderson" },
-            { name: "sophia rodriguez", table: 8, displayName: "Sophia Rodriguez" },
-            { name: "daniel thomas", table: 8, displayName: "Daniel Thomas" },
-            { name: "olivia moore", table: 8, displayName: "Olivia Moore" },
-            { name: "william jackson", table: 8, displayName: "William Jackson" },
-            { name: "ava martin", table: 9, displayName: "Ava Martin" },
-            { name: "james lee", table: 9, displayName: "James Lee" },
-            { name: "isabella garcia", table: 9, displayName: "Isabella Garcia" },
-            { name: "benjamin rodriguez", table: 9, displayName: "Benjamin Rodriguez" },
-            { name: "mia davis", table: 10, displayName: "Mia Davis" },
-            { name: "elijah wilson", table: 10, displayName: "Elijah Wilson" },
-            { name: "charlotte brown", table: 10, displayName: "Charlotte Brown" },
-            { name: "lucas miller", table: 10, displayName: "Lucas Miller" },
-            { name: "amelia jones", table: 11, displayName: "Amelia Jones" },
-            { name: "henry taylor", table: 11, displayName: "Henry Taylor" },
-            { name: "harper anderson", table: 11, displayName: "Harper Anderson" },
-            { name: "sebastian thomas", table: 11, displayName: "Sebastian Thomas" }
+            // Table 1
+            { name: "christopher thiessen", table: 1, displayName: "Christopher Thiessen" },
+            { name: "kerry thiessen", table: 1, displayName: "Kerry Thiessen" },
+            { name: "joel thiessen", table: 1, displayName: "Joel Thiessen" },
+            { name: "benjamin thiessen", table: 1, displayName: "Benjamin Thiessen" },
+            { name: "wideline thiessen", table: 1, displayName: "Wideline Thiessen" },
+            { name: "michael piva", table: 1, displayName: "Michael Piva" },
+            { name: "marissa piva", table: 1, displayName: "Marissa Piva" },
+            { name: "alecia piva", table: 1, displayName: "Alecia Piva" },
+            
+            // Table 2
+            { name: "andrew dick", table: 2, displayName: "Andrew Dick" },
+            { name: "karen dick", table: 2, displayName: "Karen Dick" },
+            { name: "garry anderson", table: 2, displayName: "Garry Anderson" },
+            { name: "esther anderson", table: 2, displayName: "Esther Anderson" },
+            { name: "andew barraclough", table: 2, displayName: "Andew Barraclough" },
+            { name: "dina willis", table: 2, displayName: "Dina Willis" },
+            { name: "tom turk", table: 2, displayName: "Tom Turk" },
+            { name: "zoe barraclough", table: 2, displayName: "Zoe Barraclough" },
+            
+            // Table 3
+            { name: "susan young", table: 3, displayName: "Susan Young" },
+            { name: "karl swierkot", table: 3, displayName: "Karl Swierkot" },
+            { name: "sharon barraclough", table: 3, displayName: "Sharon Barraclough" },
+            { name: "brianne d'souza", table: 3, displayName: "Brianne D'Souza" },
+            { name: "brian young", table: 3, displayName: "Brian Young" },
+            
+            // Table 4
+            { name: "michael bergen", table: 4, displayName: "Michael Bergen" },
+            { name: "esther hoogland", table: 4, displayName: "Esther Hoogland" },
+            { name: "levi meetsma", table: 4, displayName: "Levi Meetsma" },
+            { name: "anna kennedy", table: 4, displayName: "Anna Kennedy" },
+            { name: "ethan meier", table: 4, displayName: "Ethan Meier" },
+            { name: "nathan hellwege", table: 4, displayName: "Nathan Hellwege" },
+            { name: "logan o'sullivan", table: 4, displayName: "Logan O'Sullivan" },
+            { name: "aylie mohr", table: 4, displayName: "Aylie Mohr" },
+            
+            // Table 5
+            { name: "jennifer", table: 5, displayName: "Jennifer" },
+            { name: "kevin", table: 5, displayName: "Kevin" },
+            { name: "mercedes bell", table: 5, displayName: "Mercedes Bell" },
+            { name: "kade lowes", table: 5, displayName: "Kade Lowes" },
+            { name: "summer bell", table: 5, displayName: "Summer Bell" },
+            { name: "sadie", table: 5, displayName: "Sadie" },
+            
+            // Table 6
+            { name: "rebecca soroka", table: 6, displayName: "Rebecca Soroka" },
+            { name: "alyssa soroka", table: 6, displayName: "Alyssa Soroka" },
+            { name: "devonte saunders", table: 6, displayName: "Devonte Saunders" },
+            { name: "beverly wood", table: 6, displayName: "Beverly Wood" },
+            { name: "ramona tkachuk", table: 6, displayName: "Ramona Tkachuk" },
+            { name: "gerald noseworthy", table: 6, displayName: "Gerald Noseworthy" },
+            
+            // Table 7
+            { name: "harley feldbusch", table: 7, displayName: "Harley Feldbusch" },
+            { name: "kaija feldbusch", table: 7, displayName: "Kaija Feldbusch" },
+            { name: "reagan ohlmann", table: 7, displayName: "Reagan Ohlmann" },
+            { name: "cindy feldbusch", table: 7, displayName: "Cindy Feldbusch" },
+            { name: "keith feldbusch", table: 7, displayName: "Keith Feldbusch" },
+            { name: "josh meetsma", table: 7, displayName: "Josh Meetsma" },
+            { name: "emily meetsma", table: 7, displayName: "Emily Meetsma" },
+            { name: "brian meetsma", table: 7, displayName: "Brian Meetsma" },
+            
+            // Table 8
+            { name: "christina cooper", table: 8, displayName: "Christina Cooper" },
+            { name: "kris norris", table: 8, displayName: "Kris Norris" },
+            { name: "jude glade", table: 8, displayName: "Jude Glade" },
+            { name: "paola gonzalez", table: 8, displayName: "Paola Gonzalez" },
+            { name: "beth klassen", table: 8, displayName: "Beth Klassen" },
+            { name: "josh klassen", table: 8, displayName: "Josh Klassen" },
+            { name: "alexis cooper", table: 8, displayName: "Alexis Cooper" },
+            
+            // Table 9
+            { name: "pamela collins", table: 9, displayName: "Pamela Collins" },
+            { name: "eva collins", table: 9, displayName: "Eva Collins" },
+            { name: "rodney collins", table: 9, displayName: "Rodney Collins" },
+            { name: "tamara phillips", table: 9, displayName: "Tamara Phillips" },
+            { name: "emily collins", table: 9, displayName: "Emily Collins" },
+            { name: "corwin collins", table: 9, displayName: "Corwin Collins" },
+            { name: "corwins friend", table: 9, displayName: "Corwins Friend" },
+            
+            // Table 10
+            { name: "luke stevenson", table: 10, displayName: "Luke Stevenson" },
+            { name: "carolee stevenson", table: 10, displayName: "Carolee Stevenson" },
+            { name: "madison stevenson", table: 10, displayName: "Madison Stevenson" },
+            { name: "danielle stevenson", table: 10, displayName: "Danielle Stevenson" },
+            { name: "shirley young", table: 10, displayName: "Shirley Young" },
+            { name: "johanna rudichuk", table: 10, displayName: "Johanna Rudichuk" },
+            { name: "ryan rudichuk", table: 10, displayName: "Ryan Rudichuk" },
+            { name: "isla rudichuk", table: 10, displayName: "Isla Rudichuk" },
+            
+            // Table 11
+            { name: "randy peterson", table: 11, displayName: "Randy Peterson" },
+            { name: "norma peterson", table: 11, displayName: "Norma Peterson" },
+            { name: "janet stevenson", table: 11, displayName: "Janet Stevenson" },
+            { name: "kenneth stevenson", table: 11, displayName: "Kenneth Stevenson" },
+            { name: "benjamin stevenson", table: 11, displayName: "Benjamin Stevenson" },
+            { name: "chelsey mckinney", table: 11, displayName: "Chelsey McKinney" },
+            { name: "daeon stevenson", table: 11, displayName: "Daeon Stevenson" },
+            
+            // Table 12
+            { name: "jacqueline collins", table: 12, displayName: "Jacqueline Collins" },
+            { name: "lynelle klassen", table: 12, displayName: "Lynelle Klassen" },
+            { name: "kevin klassen", table: 12, displayName: "Kevin Klassen" },
+            { name: "maria gonzalez", table: 12, displayName: "Maria Gonzalez" },
+            { name: "adeev koul", table: 12, displayName: "Adeev Koul" },
+            { name: "jamie aquin", table: 12, displayName: "Jamie Aquin" },
+            { name: "zev rumstein", table: 12, displayName: "Zev Rumstein" },
+            { name: "khayla cres", table: 12, displayName: "Khayla Cres" },
+            
+            // Table 13
+            { name: "bride", table: 13, displayName: "Bride" },
+            { name: "groom", table: 13, displayName: "Groom" }
         ];
 
         // Create and position tables
@@ -381,15 +433,17 @@
             
             tablePositions.forEach(table => {
                 const tableElement = document.createElement('div');
-                tableElement.className = 'table';
+                tableElement.className = table.id === 'head' ? 'head-table' : 'table';
                 tableElement.setAttribute('data-table', table.id);
                 tableElement.style.left = table.x + '%';
                 tableElement.style.top = table.y + '%';
                 tableElement.style.transform = 'translate(-50%, -50%)';
                 
-                tableElement.innerHTML = `
-                    <div class="table-number">${table.id}</div>
-                `;
+                if (table.id !== 'head') {
+                    tableElement.innerHTML = `
+                        <div class="table-number">${table.id}</div>
+                    `;
+                }
                 
                 venueLayout.appendChild(tableElement);
             });
@@ -456,11 +510,6 @@
                         tableElement.classList.add('highlighted');
                     }
                 });
-
-                // Zoom to the first matching table
-                if (matchingGuests.length > 0) {
-                    zoomToTable(matchingGuests[0].table);
-                }
             }
 
             // Show search suggestions
@@ -496,14 +545,13 @@
             document.getElementById('searchInput').value = guestName;
             document.getElementById('searchSuggestions').classList.remove('show');
             
-            // Find the guest and zoom to their table
+            // Find the guest and highlight their table
             const guest = guests.find(g => g.name === guestName);
             if (guest) {
                 clearHighlights();
                 const tableElement = document.querySelector(`[data-table="${guest.table}"]`);
                 if (tableElement) {
                     tableElement.classList.add('highlighted');
-                    zoomToTable(guest.table);
                 }
             }
         }
@@ -540,30 +588,6 @@
                 document.getElementById('searchSuggestions').classList.remove('show');
             }, 200);
         });
-
-        // Zoom to a specific table
-        function zoomToTable(tableNumber) {
-            const tableElement = document.querySelector(`[data-table="${tableNumber}"]`);
-            const venueContainer = document.querySelector('.venue-container');
-            
-            if (tableElement && venueContainer) {
-                // Calculate the position to scroll to
-                const tableRect = tableElement.getBoundingClientRect();
-                const containerRect = venueContainer.getBoundingClientRect();
-                
-                // Scroll the venue container to center the table
-                venueContainer.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'center' 
-                });
-                
-                // Add a subtle zoom effect to the table
-                tableElement.style.transform = 'scale(1.2)';
-                setTimeout(() => {
-                    tableElement.style.transform = 'scale(1.15)';
-                }, 300);
-            }
-        }
     </script>
 </body>
 </html>

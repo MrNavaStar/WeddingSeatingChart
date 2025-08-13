@@ -311,17 +311,18 @@
         // Table positions configuration - modify these to match your actual venue layout
         // x and y are percentages (0-100) of the venue container
         const tablePositions = [
-            { id: 1, x: 50, y: 15 },
-            { id: 2, x: 25, y: 20 },
-            { id: 3, x: 75, y: 20 },
-            { id: 4, x: 20, y: 40 },
-            { id: 5, x: 50, y: 45 },
-            { id: 6, x: 80, y: 40 },
-            { id: 7, x: 15, y: 65 },
-            { id: 8, x: 50, y: 70 },
-            { id: 9, x: 85, y: 65 },
-            { id: 10, x: 5, y: 50 },
-            { id: 11, x: 95, y: 50 }
+            { id: 1, x: 35, y: 30 },
+            { id: 2, x: 65, y: 30 },
+            { id: 3, x: 40, y: 55 },
+            { id: 4, x: 60, y: 55 },
+            { id: 5, x: 90, y: 30 },
+            { id: 6, x: 80, y: 55 },
+            { id: 7, x: 80, y: 10 },
+            { id: 8, x: 25, y: 55 },
+            { id: 9, x: 10, y: 55 },
+            { id: 10, x: 20, y: 30 },
+            { id: 11, x: 25, y: 10 },
+            { id: 12, x: 10, y: 10 },
         ];
 
         // Sample guest data - you can modify this with your actual guest list
@@ -455,6 +456,11 @@
                         tableElement.classList.add('highlighted');
                     }
                 });
+
+                // Zoom to the first matching table
+                if (matchingGuests.length > 0) {
+                    zoomToTable(matchingGuests[0].table);
+                }
             }
 
             // Show search suggestions
@@ -489,7 +495,17 @@
         function selectSuggestion(guestName) {
             document.getElementById('searchInput').value = guestName;
             document.getElementById('searchSuggestions').classList.remove('show');
-            searchGuest();
+            
+            // Find the guest and zoom to their table
+            const guest = guests.find(g => g.name === guestName);
+            if (guest) {
+                clearHighlights();
+                const tableElement = document.querySelector(`[data-table="${guest.table}"]`);
+                if (tableElement) {
+                    tableElement.classList.add('highlighted');
+                    zoomToTable(guest.table);
+                }
+            }
         }
 
         // Initialize tables when page loads
@@ -524,6 +540,30 @@
                 document.getElementById('searchSuggestions').classList.remove('show');
             }, 200);
         });
+
+        // Zoom to a specific table
+        function zoomToTable(tableNumber) {
+            const tableElement = document.querySelector(`[data-table="${tableNumber}"]`);
+            const venueContainer = document.querySelector('.venue-container');
+            
+            if (tableElement && venueContainer) {
+                // Calculate the position to scroll to
+                const tableRect = tableElement.getBoundingClientRect();
+                const containerRect = venueContainer.getBoundingClientRect();
+                
+                // Scroll the venue container to center the table
+                venueContainer.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+                
+                // Add a subtle zoom effect to the table
+                tableElement.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    tableElement.style.transform = 'scale(1.15)';
+                }, 300);
+            }
+        }
     </script>
 </body>
 </html>

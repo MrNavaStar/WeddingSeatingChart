@@ -127,8 +127,8 @@
 
         .table {
             position: absolute;
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             background: white;
             border: 3px solid #e9ecef;
             border-radius: 50%;
@@ -152,8 +152,17 @@
             border-color: #5d7c8a;
             background: #f0f8ff;
             box-shadow: 0 0 25px rgba(93, 124, 138, 0.6);
-            transform: scale(1.15);
             z-index: 30;
+            animation: tableGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes tableGlow {
+            0% {
+                box-shadow: 0 0 25px rgba(93, 124, 138, 0.6);
+            }
+            100% {
+                box-shadow: 0 0 35px rgba(93, 124, 138, 0.9), 0 0 50px rgba(93, 124, 138, 0.4);
+            }
         }
 
         .table-number {
@@ -187,8 +196,8 @@
 
         .head-table {
             position: absolute;
-            width: 100px;
-            height: 60px;
+            width: 90px;
+            height: 55px;
             background: linear-gradient(135deg, #5d7c8a 0%, #4a6b7a 100%);
             border: 4px solid #3d5a6b;
             border-radius: 12px;
@@ -205,6 +214,23 @@
             transform: scale(1.05);
             box-shadow: 0 6px 25px rgba(0,0,0,0.3);
             z-index: 25;
+        }
+
+        .head-table.highlighted {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, #6b8c9a 0%, #5a7b8a 100%);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+            z-index: 35;
+            animation: headTableGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes headTableGlow {
+            0% {
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+            }
+            100% {
+                box-shadow: 0 0 40px rgba(255, 215, 0, 0.9), 0 0 60px rgba(255, 215, 0, 0.4);
+            }
         }
 
         .head-table-label {
@@ -238,8 +264,13 @@
             }
             
             .table {
-                width: 60px;
-                height: 60px;
+                width: 55px;
+                height: 55px;
+            }
+            
+            .head-table {
+                width: 75px;
+                height: 45px;
             }
             
             .table-number {
@@ -257,8 +288,13 @@
             }
             
             .table {
-                width: 50px;
-                height: 50px;
+                width: 45px;
+                height: 45px;
+            }
+            
+            .head-table {
+                width: 65px;
+                height: 40px;
             }
             
             .table-number {

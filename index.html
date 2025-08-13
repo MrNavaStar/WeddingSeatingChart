@@ -254,6 +254,48 @@
             margin-top: 3px;
         }
 
+        .guest-list-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .guest-list {
+            text-align: left;
+            font-size: 0.9rem;
+            color: #333;
+            line-height: 1.6;
+            padding-right: 10px;
+        }
+
+        .guest-list-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.2s ease;
+        }
+
+        .guest-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .guest-list-item:hover {
+            background-color: #e9ecef;
+        }
+
+        .guest-list-name {
+            font-weight: 500;
+            color: #5d7c8a;
+        }
+
+        .guest-list-table {
+            font-size: 0.7rem;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+
         @media (max-width: 768px) {
             .venue-container {
                 padding: 20px;
@@ -320,6 +362,11 @@
             <div class="venue-layout" id="venueLayout">
                 <!-- Tables will be positioned here by JavaScript -->
             </div>
+        </div>
+
+        <div class="guest-list-container" id="guestListContainer" style="display: none;">
+            <h3 id="guestListTitle" style="color: #5d7c8a; margin-bottom: 1rem; text-align: center;"></h3>
+            <div class="guest-list" id="guestList"></div>
         </div>
 
         <div class="layout-note">
@@ -479,10 +526,46 @@
                     tableElement.innerHTML = `
                         <div class="table-number">${table.id}</div>
                     `;
+                    
+                    // Add click event to show guests (excluding head table)
+                    tableElement.addEventListener('click', function() {
+                        showGuestList(table.id);
+                    });
                 }
                 
                 venueLayout.appendChild(tableElement);
             });
+        }
+
+        // Show guest list for a specific table
+        function showGuestList(tableNumber) {
+            const guestListContainer = document.getElementById('guestListContainer');
+            const guestListTitle = document.getElementById('guestListTitle');
+            const guestList = document.getElementById('guestList');
+            
+            // Find guests at this table
+            const tableGuests = guests.filter(g => g.table == tableNumber);
+            
+            if (tableGuests.length > 0) {
+                // Update title
+                guestListTitle.textContent = `Table ${tableNumber}`;
+                
+                // Create guest list
+                guestList.innerHTML = tableGuests.map(guest => `
+                    <div class="guest-list-item">
+                        <div class="guest-list-name">${guest.displayName}</div>
+                    </div>
+                `).join('');
+                
+                // Show the container
+                guestListContainer.style.display = 'block';
+            }
+        }
+
+        // Clear guest list
+        function clearGuestList() {
+            const guestListContainer = document.getElementById('guestListContainer');
+            guestListContainer.style.display = 'none';
         }
 
         // Real-time search highlighting
@@ -526,12 +609,14 @@
             
             if (searchTerm === '') {
                 clearHighlights();
+                clearGuestList();
                 suggestionsContainer.classList.remove('show');
                 return;
             }
 
-            // Clear previous highlights
+            // Clear previous highlights and guest list
             clearHighlights();
+            clearGuestList();
 
             // Find matching guests
             const matchingGuests = guests.filter(g => 
@@ -546,6 +631,12 @@
                         tableElement.classList.add('highlighted');
                     }
                 });
+
+                // Auto-open guest list if only one table matches
+                if (matchingGuests.length === 1) {
+                    const uniqueTable = matchingGuests[0].table;
+                    showGuestList(uniqueTable);
+                }
             }
 
             // Show search suggestions
@@ -585,9 +676,12 @@
             const guest = guests.find(g => g.name === guestName);
             if (guest) {
                 clearHighlights();
+                clearGuestList();
                 const tableElement = document.querySelector(`[data-table="${guest.table}"]`);
                 if (tableElement) {
                     tableElement.classList.add('highlighted');
+                    // Auto-open guest list for this table
+                    showGuestList(guest.table);
                 }
             }
         }

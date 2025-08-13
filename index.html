@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wedding Guest Seating Chart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* =============================
+           THEME & QUICK TWEAK VARIABLES
+           ============================= */
+        :root {
+            /* Colors */
+            --dusty-blue: #7599a6;           /* primary */
+            --dusty-blue-600: #5e8694;       /* darker accent */
+            --dusty-blue-200: #b8ccd3;       /* light accent */
+            --cream: #faf7f3;                /* background */
+            --gold: #d6b581;                 /* highlight */
+            --ink: #2e3a3f;                  /* text */
+
+            /* Layout sizing (you can tweak these) */
+            --chart-max-width: 980px;        /* overall chart width on desktop */
+            --chart-height: 650px;           /* drawing area height */
+            --table-size: 64px;              /* diameter of a round table */
+        }
+
+        /* ===== Base Styles ===== */
+        html, body { height: 100%; }
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, sans-serif;
+            color: var(--ink);
+            background: var(--cream);
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6));
+            backdrop-filter: saturate(1.2) blur(6px);
+            border-bottom: 1px solid rgba(46,58,63,0.06);
+        }
+        .container { max-width: 1040px; margin: 0 auto; padding: 14px 16px; }
+
+        .brand {
+            font-family: 'Playfair Display', Georgia, serif;
+            color: var(--dusty-blue-600);
+            font-size: clamp(1.25rem, 2.6vw, 1.85rem);
+            margin: 0 0 10px 0;
+        }
+
+        .controls { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+        @media (max-width: 520px) { .controls { grid-template-columns: 1fr; } }
+
+        #search {
+            width: 100%;
+            font-size: 1rem;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 2px solid var(--dusty-blue-200);
+            background: #fff;
+            outline: none;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.02), 0 6px 18px rgba(94,134,148,0.06);
+        }
+        #search:focus { border-color: var(--dusty-blue); box-shadow: 0 0 0 4px rgba(117,153,166,0.18); }
+
+        button.reset {
+            appearance: none; cursor: pointer; border: none; border-radius: 12px;
+            padding: 12px 14px; font-weight: 600; font-size: 0.95rem;
+            color: #fff; background: var(--dusty-blue-600);
+            box-shadow: 0 6px 18px rgba(94,134,148,0.25);
+        }
+        button.reset:active { transform: translateY(1px); }
+
+        .note { font-size: 0.9rem; color: #56646a; margin-top: 8px; }
+
+        /* ===== Chart Area ===== */
+        .stage-wrap { display: grid; place-items: center; padding: 14px 16px 26px; }
+        #chart { position: relative; width: 100%; max-width: var(--chart-max-width); height: var(--chart-height); border-radius: 18px;
+            background: linear-gradient(180deg, #ffffff, #fbfbfb);
+            box-shadow: 0 14px 36px rgba(46,58,63,0.08), inset 0 0 0 1px rgba(46,58,63,0.06);
+            overflow: hidden; }
+
+        /* optional soft grid for layout guidance (toggle by adding .grid to #chart) */
+        #chart.grid::before {
+            content: ""; position: absolute; inset: 0; pointer-events: none;
+            background-image:
+                    linear-gradient(to right, rgba(117,153,166,0.08) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(117,153,166,0.08) 1px, transparent 1px);
+            background-size: 80px 80px; /* grid size */
+        }
+
+        /* ===== Tables ===== */
+        .table { position: absolute; width: var(--table-size); height: var(--table-size);
+            background: var(--dusty-blue-200); color: #fff; border-radius: 50%;
+            border: 2px solid var(--dusty-blue);
+            display: grid; place-items: center; font-weight: 700;
+            letter-spacing: 0.3px;
+            box-shadow: 0 10px 20px rgba(94,134,148,0.22);
+            transition: transform 240ms ease, box-shadow 240ms ease, background 240ms ease, border-color 240ms ease, color 240ms ease;
+            user-select: none; }
+
+        .table:hover { transform: translateY(-2px); }
+
+        .table.highlight {
+            background: var(--gold); color: #2f2a20; border-color: var(--gold);
+            box-shadow: 0 0 0 8px rgba(214,181,129,0.25), 0 16px 36px rgba(214,181,129,0.35);
+            animation: pulse 1.3s ease-in-out 2;
+            transform: scale(1.12);
+            z-index: 10;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(214,181,129,0.35); }
+            70% { box-shadow: 0 0 0 16px rgba(214,181,129,0); }
+            100% { box-shadow: 0 0 0 0 rgba(214,181,129,0); }
+        }
+
+        /* Head table (fixed top center for reference) */
+        .head-table { position: absolute; left: 50%; transform: translateX(-50%);
+            top: 18px; width: min(72%, 560px); height: 56px; border-radius: 14px;
+            background: var(--dusty-blue); color: #fff; border: 2px solid var(--dusty-blue-200);
+            display: grid; place-items: center; font-weight: 700; letter-spacing: 0.2px;
+            box-shadow: 0 10px 20px rgba(94,134,148,0.25); }
+
+        /* Results & suggestions */
+        #result { text-align: center; font-weight: 700; margin: 10px auto 0; color: var(--dusty-blue-600); }
+        .suggestions { max-width: 680px; margin: 8px auto 0; padding: 8px 0; list-style: none; }
+        .suggestions li { cursor: pointer; padding: 10px 12px; margin: 6px 12px; border-radius: 12px; background: #fff;
+            border: 1px solid rgba(46,58,63,0.06); box-shadow: 0 6px 18px rgba(46,58,63,0.06); }
+        .suggestions li:hover { background: #f8fbfc; }
+
+        /* ===== Mobile tweaks ===== */
+        @media (max-width: 680px) {
+            :root { --chart-height: 540px; --table-size: 52px; }
+            .head-table { height: 48px; font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="container">
+        <h1 class="brand">Seating Chart</h1>
+        <div class="controls" role="search">
+            <input id="search" type="text" placeholder="Search your name…" aria-label="Search guest name" list="guest-list" autocomplete="off" />
+        </div>
+        <p class="note">Tip: start typing your first or last name — the matching table will glow.</p>
+        <datalist id="guest-list"></datalist>
+    </div>
+</header>
+
+<main class="stage-wrap">
+    <section id="chart" aria-label="Ballroom layout with tables">
+        <div class="head-table" aria-hidden="true">Head Table</div>
+        <!-- Tables will be injected here by JS -->
+    </section>
+
+    <div id="result" aria-live="polite"></div>
+    <ul class="suggestions" id="suggestions" aria-label="Matching guests"></ul>
+</main>
+
+<script>
+    // =========================
+    // CONFIGURATION VARIABLES
+    // =========================
+
+    // Tweak overall canvas size & table diameter directly via CSS variables at top.
+    // For precise table placement, edit the coordinates below (in pixels, relative to #chart's top-left corner).
+
+    const tablePositions = {
+        1:  { top: 110, left: 120 },
+        2:  { top: 110, left: 300 },
+        3:  { top: 110, left: 480 },
+        4:  { top: 110, left: 660 },
+
+        5:  { top: 240, left: 80 },
+        6:  { top: 240, left: 240 },
+        7:  { top: 240, left: 420 },
+        8:  { top: 240, left: 600 },
+
+        9:  { top: 370, left: 120 },
+        10: { top: 370, left: 300 },
+        11: { top: 370, left: 480 },
+        12: { top: 370, left: 660 }
+    };
+
+    // Map of Guest Name -> Table Number. Add your real guest list here.
+    // Partial names are supported (e.g., typing "Ari" matches "Arielle Collins").
+    const guests = {
+        "Alice Johnson": 1,
+        "Bob Smith": 3,
+        "Charlie Davis": 5,
+        "Diana Prince": 8,
+        "Ethan Brown": 12,
+        "Fiona Clark": 6,
+        "Arielle Collins": 2,
+        "Jordan Lee": 4,
+        "Sam Patel": 7,
+        "Morgan Taylor": 9,
+        "Jamie Nguyen": 10,
+        "Priya Shah": 11
+    };
+
+    // =========================
+    // RENDER TABLES
+    // =========================
+    const chart = document.getElementById('chart');
+    const tableElements = {};
+
+    function createTables() {
+        for (let i = 1; i <= 12; i++) {
+            const tbl = document.createElement('div');
+            tbl.className = 'table';
+            tbl.textContent = i;
+            tbl.setAttribute('role', 'button');
+            tbl.setAttribute('aria-label', `Table ${i}`);
+            tbl.dataset.table = i;
+
+            const pos = tablePositions[i];
+            if (!pos) continue;
+            tbl.style.top = pos.top + 'px';
+            tbl.style.left = pos.left + 'px';
+
+            tbl.addEventListener('click', () => focusTable(i, `Table ${i}`));
+
+            chart.appendChild(tbl);
+            tableElements[i] = tbl;
+        }
+    }
+
+    createTables();
+
+    // Populate datalist for quick native suggestions
+    const dataList = document.getElementById('guest-list');
+    Object.keys(guests).sort().forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        dataList.appendChild(opt);
+    });
+
+    // =========================
+    // SEARCH + HIGHLIGHT + AUTO-FOCUS
+    // =========================
+    const searchInput = document.getElementById('search');
+    const resultEl = document.getElementById('result');
+    const suggestions = document.getElementById('suggestions');
+
+    function normalize(str) {
+        return (str || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+    }
+
+    function clearHighlights() {
+        Object.values(tableElements).forEach(el => el.classList.remove('highlight'));
+    }
+
+    function focusTable(tableNumber, labelText) {
+        clearHighlights();
+        const el = tableElements[tableNumber];
+        if (!el) return;
+        el.classList.add('highlight');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+        resultEl.textContent = labelText || `Table ${tableNumber}`;
+    }
+
+    function setSuggestions(names, query) {
+        suggestions.innerHTML = '';
+        if (!names || names.length <= 1) return;
+        names.slice(0, 6).forEach(n => {
+            const li = document.createElement('li');
+            li.textContent = n;
+            li.addEventListener('click', () => {
+                searchInput.value = n;
+                runSearch(n);
+            });
+            suggestions.appendChild(li);
+        });
+    }
+
+    function runSearch(val) {
+        const q = normalize(val ?? searchInput.value.trim());
+        clearHighlights();
+        suggestions.innerHTML = '';
+
+        if (!q) { resultEl.textContent = ''; return; }
+
+        const names = Object.keys(guests);
+        const matches = names.filter(name => normalize(name).includes(q));
+
+        if (matches.length === 0) {
+            resultEl.textContent = 'Guest not found';
+            return;
+        }
+
+        // If exact match exists, prefer it; else use first match.
+        const exact = names.find(name => normalize(name) === q);
+        const chosen = exact || matches[0];
+        const tableNumber = guests[chosen];
+
+        focusTable(tableNumber, `${chosen} • Table ${tableNumber}`);
+
+        // Provide clickable alternatives if multiple matches
+        if (!exact && matches.length > 1) {
+            setSuggestions(matches, q);
+        }
+    }
+
+    searchInput.addEventListener('input', () => runSearch());
+    document.getElementById('clearBtn').addEventListener('click', () => {
+        searchInput.value = '';
+        suggestions.innerHTML = '';
+        resultEl.textContent = '';
+        clearHighlights();
+        searchInput.focus();
+    });
+
+    // Support pressing Enter to lock in the top suggestion
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            runSearch();
+        }
+    });
+
+    // Expose a tiny helper for you from the console if needed
+    window._focusTable = focusTable;
+</script>
+</body>
+</html>
